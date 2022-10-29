@@ -11,4 +11,4 @@
 
 ## Latest work:
 
-![Ray tracing with shadows](screenshot-2022-10-29 17-31-20.png)
+![Ray tracing with shadows](<screenshot-2022-10-29 17-31-20.png>)
