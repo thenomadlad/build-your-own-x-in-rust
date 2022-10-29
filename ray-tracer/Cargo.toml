@@ -1,0 +1,13 @@
+[package]
+name = "ray-tracer"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+sdl2 = "0.35.2"
+roots = "0.0.7"
+append-only-vec = "0.1.2"
+ndarray = { version = "0.15.6", features = ["blas"] }
+ndarray-linalg = { version = "0.16.0", features = ["netlib-static"] }
