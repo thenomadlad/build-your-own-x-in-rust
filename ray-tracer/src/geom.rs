@@ -100,9 +100,9 @@ pub struct Color {
 impl Color {
     pub fn with_brightness(&self, brightness: f64) -> Color {
         Color {
-            r: ((self.r as f64 * brightness) % 256.0) as u8,
-            g: ((self.g as f64 * brightness) % 256.0) as u8,
-            b: ((self.b as f64 * brightness) % 256.0) as u8,
+            r: (self.r as f64 * brightness).min(255.0) as u8,
+            g: (self.g as f64 * brightness).min(255.0) as u8,
+            b: (self.b as f64 * brightness).min(255.0) as u8,
             a: self.a,
         }
     }

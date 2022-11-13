@@ -50,7 +50,8 @@ impl Viewport {
         camera: &Camera,
         light: &Light,
         objects: &Vec<DrawableObject>,
-        _debug_context: &Option<DebugContext>
+        _debug_context: &Option<DebugContext>,
+        min_brightness: f64
     ) {
         let total_rows = self.height;
         let total_cols = self.width;
@@ -76,19 +77,25 @@ impl Viewport {
                     let (shadow_ray, _) = Ray::between(&hit_position, &light.position);
                     let is_in_shadow = objects
                         .iter()
-                        // .filter(|obj| !std::ptr::eq(*obj, hit_obj))
                         .map(|obj| obj.find_intersection(&shadow_ray, 0.1))
                         .any(|v| v.is_some());
 
                     if !is_in_shadow {
-                        Some(hit_obj.color.with_brightness(light.brightness))
+                        let brightness = compute_light_brightness(&shadow_ray, hit_obj, light);
+                        Some(hit_obj.color.with_brightness(f64::max(brightness, min_brightness)))
                     } else {
-                        Some(hit_obj.color.with_brightness(0.1))
+                        Some(hit_obj.color.with_brightness(min_brightness))
                     }
                 })
                 .unwrap_or_else(Color::black)
         })
     }
+}
+
+fn compute_light_brightness(shadow_ray: &Ray, drawable: &DrawableObject, light: &Light) -> f64 {
+    let perpendicular = drawable.find_perpendicular(&shadow_ray.start);
+    let dot = shadow_ray.direction.dot(&perpendicular.direction);
+    light.brightness * (dot.powi(3) + dot)
 }
 
 fn compute_prim_ray(

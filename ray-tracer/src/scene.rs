@@ -85,4 +85,10 @@ impl DrawableObject {
             }
         }
     }
+
+    pub fn find_perpendicular(&self, hit_point: &Point) -> Ray {
+        match self.shape {
+            Shape::Sphere { .. } => Ray::between(&self.center, hit_point).0,
+        }
+    }
 }

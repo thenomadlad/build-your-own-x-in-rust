@@ -108,7 +108,8 @@ fn main() {
             brightness: 1.0,
         },
         &scene,
-        &mut debug_context
+        &mut debug_context,
+        0.1
     );
 
     display_scene_window(&viewport, 1000, 1000, &camera, &debug_context);
