@@ -215,14 +215,14 @@ fn draw_scene_on_canvas(viewport: &Viewport, rect_height: usize, rect_width: usi
 /// 
 /// which is a system of linear equations
 fn display_debug_points(debug_context: &DebugContext, height: usize, width: usize, camera: &Camera, canvas: &mut Canvas<Window>) {
+    let x_direction = &camera.top_right - &camera.top_left;
+    let y_direction = &camera.bottom_left - &camera.top_left;
+
+    let v = &camera.eye_position - &camera.top_left;
+
     for (point, color) in debug_context.point_pairs.iter() {
         // compute the point to show on the view screen
         let ray = point - &camera.eye_position;
-        let x_direction = &camera.top_right - &camera.top_left;
-        let y_direction = &camera.bottom_left - &camera.top_left;
-
-        let v = &camera.eye_position - &camera.top_left;
-
         let solution: Array1<f64> = array![
             [x_direction.x, x_direction.y, x_direction.z],
             [y_direction.x, y_direction.y, y_direction.z],
