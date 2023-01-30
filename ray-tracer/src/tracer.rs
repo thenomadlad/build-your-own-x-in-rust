@@ -9,6 +9,7 @@ pub struct Viewport {
     pub values: Vec<Color>,
 }
 
+#[allow(dead_code)]
 struct ViewportPosition {
     row: usize,
     col: usize,
@@ -51,29 +52,18 @@ impl Viewport {
         light: &Light,
         objects: &Vec<DrawableObject>,
         _debug_context: &Option<DebugContext>,
-        min_brightness: f64
+        ambient_brightness: f64
     ) {
         let total_rows = self.height;
         let total_cols = self.width;
 
         self.compute_each(|ViewportPosition { row, col, .. }| {
-            let prim_ray = compute_prim_ray(camera, row, total_rows, col, total_cols);
+            let mut prim_rays = vec![compute_prim_ray(camera, row, total_rows, col, total_cols)];
+            let mut color = Color::black();
 
-            // compute a possible hit
-            let mut possible_hit = Option::<(Point, &DrawableObject)>::None;
-            let mut min_dist = f64::MAX;
-            for obj in objects {
-                if let Some(hit_position) = obj.find_intersection(&prim_ray, 0.1) {
-                    let dist = hit_position.dist(&camera.eye_position);
-                    if dist < min_dist {
-                        possible_hit = Some((hit_position, obj));
-                        min_dist = dist;
-                    }
-                }
-            }
-
-            possible_hit
-                .and_then(|(hit_position, hit_obj)| {
+            while let Some(prim_ray) = prim_rays.pop() {
+                if let Some((hit_position, hit_obj)) = find_intersecting_object(objects, &prim_ray) {
+                    
                     let (shadow_ray, _) = Ray::between(&hit_position, &light.position);
                     let is_in_shadow = objects
                         .iter()
@@ -82,14 +72,26 @@ impl Viewport {
 
                     if !is_in_shadow {
                         let brightness = compute_light_brightness(&shadow_ray, hit_obj, light);
-                        Some(hit_obj.color.with_brightness(f64::max(brightness, min_brightness)))
+                        
+                        // compute color using brightness and return
+                        hit_obj.color.with_brightness(f64::max(brightness, ambient_brightness));
                     } else {
-                        Some(hit_obj.color.with_brightness(min_brightness))
+                        // if in shadow, we show with ambient brightness
+                        hit_obj.color.with_brightness(ambient_brightness);
                     }
-                })
-                .unwrap_or_else(Color::black)
+                }
+            }
+
+            color
         })
     }
+}
+
+fn find_intersecting_object<'a>(objects: &'a Vec<DrawableObject>, ray: &Ray) -> Option<(Point, &'a DrawableObject)> {
+    objects.iter()
+        .map(|obj| obj.find_intersection(&ray, 0.1).map(|hit_position| (hit_position, obj)))
+        .flatten()
+        .min_by_key(|(point, _)| (ray.start.dist(point) * 100000.0).round() as u64)
 }
 
 fn compute_light_brightness(shadow_ray: &Ray, drawable: &DrawableObject, light: &Light) -> f64 {

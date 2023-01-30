@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use debug::DebugContext;
-use geom::{Color, Point, Ray};
+use geom::{Color, Point};
 use ndarray::{array, Array1};
 use ndarray_linalg::Solve;
 use scene::{DrawableObject, Shape};
@@ -26,7 +26,7 @@ fn main() {
                 r: 255,
                 g: 0,
                 b: 0,
-                a: 0,
+                a: 123
             },
             center: Point {
                 x: 50.0,
@@ -41,7 +41,7 @@ fn main() {
                 r: 0,
                 g: 255,
                 b: 0,
-                a: 0,
+                a: 255,
             },
             center: Point {
                 x: 50.0,
@@ -56,7 +56,7 @@ fn main() {
                 r: 0,
                 g: 0,
                 b: 255,
-                a: 0,
+                a: 255,
             },
             center: Point {
                 x: 50.0,
@@ -112,6 +112,7 @@ fn main() {
         0.1
     );
 
+    println!("Displaying");
     display_scene_window(&viewport, 1000, 1000, &camera, &debug_context);
 
     // for chunk in viewport.values.chunks_exact(viewport.width) {

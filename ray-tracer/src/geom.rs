@@ -115,6 +115,22 @@ impl Color {
             a: 0,
         }
     }
+
+    pub fn total_color_after_transparency(&self, behind: &Color) -> Color {
+        Color {
+            r: Color::weighted_average_part(self.a, self.r, behind.r),
+            g: Color::weighted_average_part(self.a, self.g, behind.g),
+            b: Color::weighted_average_part(self.a, self.b, behind.b),
+            a: self.a,
+        }
+    }
+
+    fn weighted_average_part(alpha: u8, lhs: u8, rhs: u8) -> u8 {
+        let ratio = alpha as f32 / 256.0;
+        let value = (lhs as f32 * ratio) + (rhs as f32 * (1.0 - ratio));
+
+        f32::max(0.0, f32::min(value.round(), 255.0)) as u8
+    }
 }
 
 impl From<&Color> for sdl2::pixels::Color {
