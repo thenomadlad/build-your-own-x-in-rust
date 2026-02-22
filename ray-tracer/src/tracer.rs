@@ -1,6 +1,7 @@
 use crate::{
-    geom::{Color, Ray, Point},
-    scene::{Camera, DrawableObject, Light}, debug::DebugContext,
+    debug::DebugContext,
+    geom::{Color, Point, Ray},
+    scene::{Camera, DrawableObject, Light},
 };
 
 pub struct Viewport {
@@ -9,10 +10,11 @@ pub struct Viewport {
     pub values: Vec<Color>,
 }
 
+#[allow(unused)]
 struct ViewportPosition {
     row: usize,
     col: usize,
-    idx: usize
+    idx: usize,
 }
 
 impl Viewport {
@@ -51,7 +53,7 @@ impl Viewport {
         light: &Light,
         objects: &Vec<DrawableObject>,
         _debug_context: &Option<DebugContext>,
-        min_brightness: f64
+        min_brightness: f64,
     ) {
         let total_rows = self.height;
         let total_cols = self.width;
@@ -82,7 +84,11 @@ impl Viewport {
 
                     if !is_in_shadow {
                         let brightness = compute_light_brightness(&shadow_ray, hit_obj, light);
-                        Some(hit_obj.color.with_brightness(f64::max(brightness, min_brightness)))
+                        Some(
+                            hit_obj
+                                .color
+                                .with_brightness(f64::max(brightness, min_brightness)),
+                        )
                     } else {
                         Some(hit_obj.color.with_brightness(min_brightness))
                     }

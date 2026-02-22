@@ -5,7 +5,7 @@ use append_only_vec::AppendOnlyVec;
 use crate::geom::{Color, Point};
 
 pub struct DebugContext {
-    pub point_pairs: AppendOnlyVec<(Point, Color)>
+    pub point_pairs: AppendOnlyVec<(Point, Color)>,
 }
 
 impl DebugContext {
@@ -14,6 +14,8 @@ impl DebugContext {
     }
 
     pub(crate) fn new() -> Self {
-        DebugContext { point_pairs: AppendOnlyVec::new() }
+        DebugContext {
+            point_pairs: AppendOnlyVec::new(),
+        }
     }
 }

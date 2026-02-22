@@ -2,20 +2,20 @@ use std::time::Duration;
 
 use debug::DebugContext;
 use geom::{Color, Point};
-use ndarray::{array, Array1};
+use ndarray::{Array1, array};
 use ndarray_linalg::Solve;
 use scene::{DrawableObject, Shape};
-use sdl2::{event::Event, keyboard::Keycode, render::Canvas, video::Window, rect::Rect};
+use sdl2::{event::Event, keyboard::Keycode, rect::Rect, render::Canvas, video::Window};
 
 use crate::{
     scene::{Camera, Light},
     tracer::Viewport,
 };
 
+mod debug;
 mod geom;
 mod scene;
 mod tracer;
-mod debug;
 
 fn main() {
     // scene consists of one sphere
@@ -109,7 +109,7 @@ fn main() {
         },
         &scene,
         &mut debug_context,
-        0.1
+        0.1,
     );
 
     display_scene_window(&viewport, 1000, 1000, &camera, &debug_context);
@@ -119,7 +119,13 @@ fn main() {
     // }
 }
 
-fn display_scene_window(viewport: &Viewport, height: usize, width: usize, camera: &Camera, debug_context: &Option<DebugContext>) {
+fn display_scene_window(
+    viewport: &Viewport,
+    height: usize,
+    width: usize,
+    camera: &Camera,
+    debug_context: &Option<DebugContext>,
+) {
     assert!(height >= viewport.height);
     assert!(height >= viewport.width);
 
@@ -159,9 +165,10 @@ fn display_scene_window(viewport: &Viewport, height: usize, width: usize, camera
         for event in event_pump.poll_iter() {
             match event {
                 Event::MouseButtonDown { x, y, .. } => {
-                    let index = (y as usize / rect_height) * viewport.width + (x as usize / rect_width);
+                    let index =
+                        (y as usize / rect_height) * viewport.width + (x as usize / rect_width);
                     println!("x: {x}, y: {y}: {index}");
-                },
+                }
                 Event::Quit { .. }
                 | Event::KeyDown {
                     keycode: Some(Keycode::Escape),
@@ -175,7 +182,12 @@ fn display_scene_window(viewport: &Viewport, height: usize, width: usize, camera
     }
 }
 
-fn draw_scene_on_canvas(viewport: &Viewport, rect_height: usize, rect_width: usize, canvas: &mut Canvas<Window>) {
+fn draw_scene_on_canvas(
+    viewport: &Viewport,
+    rect_height: usize,
+    rect_width: usize,
+    canvas: &mut Canvas<Window>,
+) {
     for row in 0..viewport.height {
         for col in 0..viewport.width {
             let idx = row * viewport.width + col;
@@ -203,18 +215,24 @@ fn draw_scene_on_canvas(viewport: &Viewport, rect_height: usize, rect_width: usi
 /// let r^ be the vector from the camera's eye to the point we want to render
 /// let w^ be the vector from top left to top right of the camera viewport
 /// let h^ be the vector from top left to bottom right
-/// 
+///
 /// If we are able to identify how far along w^ and h^ we need to travel to meet r^, we can use that
 /// to compute the x and y coordinate we need to draw onto the screen. THat is, solve for x and y where
-/// 
+///
 ///     (top-left-point) + x w^ + y h^ = eye + t r^     x, y, t are real numbers
-/// 
+///
 /// rearranging the values, we are solving for:
 ///     
 ///     x w^ + y h^ - t r^ = eye - (top-left-point)
-/// 
+///
 /// which is a system of linear equations
-fn display_debug_points(debug_context: &DebugContext, height: usize, width: usize, camera: &Camera, canvas: &mut Canvas<Window>) {
+fn display_debug_points(
+    debug_context: &DebugContext,
+    height: usize,
+    width: usize,
+    camera: &Camera,
+    canvas: &mut Canvas<Window>,
+) {
     let x_direction = &camera.top_right - &camera.top_left;
     let y_direction = &camera.bottom_left - &camera.top_left;
 
@@ -227,16 +245,19 @@ fn display_debug_points(debug_context: &DebugContext, height: usize, width: usiz
             [x_direction.x, x_direction.y, x_direction.z],
             [y_direction.x, y_direction.y, y_direction.z],
             [-ray.x, -ray.y, -ray.z],
-        ].t().solve_into(array![v.x, v.y, v.z]).unwrap();
+        ]
+        .t()
+        .solve_into(array![v.x, v.y, v.z])
+        .unwrap();
 
         canvas.set_draw_color(color);
-        canvas.fill_rect(
-            Rect::new(
+        canvas
+            .fill_rect(Rect::new(
                 (width as f64 * solution.get(0).unwrap()) as i32 - 3,
                 (height as f64 * solution.get(1).unwrap()) as i32 - 3,
                 6,
                 6,
-            ),
-        ).unwrap();
+            ))
+            .unwrap();
     }
 }

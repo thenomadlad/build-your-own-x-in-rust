@@ -82,10 +82,13 @@ impl Ray {
         let dist = diff.norm();
         let direction = &diff / dist;
 
-        (Ray {
-            start: start.clone(),
-            direction,
-        }, dist)
+        (
+            Ray {
+                start: start.clone(),
+                direction,
+            },
+            dist,
+        )
     }
 }
 

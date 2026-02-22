@@ -10,6 +10,7 @@ pub struct Light {
     pub brightness: f64,
 }
 
+#[allow(unused)]
 pub struct Camera {
     pub eye_position: Point,
     pub top_left: Point,
@@ -19,6 +20,7 @@ pub struct Camera {
 }
 
 #[derive(Debug)]
+#[allow(unused)]
 pub struct DrawableObject {
     pub id: String,
     pub color: Color,
@@ -70,11 +72,13 @@ impl DrawableObject {
                     SmC_dot_SmC - radius.powi(2),
                 ) {
                     roots::Roots::No(_) => None,
-                    roots::Roots::One(ts) => if ts[0] > min_dist {
-                        Some(ts[0])
-                    } else {
-                        None
-                    },
+                    roots::Roots::One(ts) => {
+                        if ts[0] > min_dist {
+                            Some(ts[0])
+                        } else {
+                            None
+                        }
+                    }
                     roots::Roots::Two(ts) => ts.into_iter().filter(|t| *t > min_dist).nth(0),
                     _ => unreachable!(),
                 };
