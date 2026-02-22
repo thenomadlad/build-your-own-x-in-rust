@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use debug::DebugContext;
-use geom::{Color, Point, Ray};
+use geom::{Color, Point};
 use ndarray::{array, Array1};
 use ndarray_linalg::Solve;
 use scene::{DrawableObject, Shape};
